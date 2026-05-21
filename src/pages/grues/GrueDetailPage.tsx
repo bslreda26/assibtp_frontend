@@ -15,7 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { formatDate } from '@/lib/format'
+import { formatDate, formatLocationPeriod } from '@/lib/format'
 import * as gruesService from '@/services/grues.service'
 
 export function GrueDetailPage() {
@@ -80,7 +80,7 @@ export function GrueDetailPage() {
                             {loc.client?.nom ?? `Client #${loc.clientId}`}
                           </Link>
                         </TableCell>
-                        <TableCell>{formatDate(loc.dateSortie)} → {formatDate(loc.dateFin)}</TableCell>
+                        <TableCell>{formatLocationPeriod(loc)}</TableCell>
                         <TableCell><StatusBadge statut={loc.statut} /></TableCell>
                       </TableRow>
                     ))}

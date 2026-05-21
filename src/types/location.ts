@@ -5,7 +5,7 @@ export type Location = {
   clientId: number
   grueId: number
   dateSortie: string
-  dateFin: string
+  dateFin: string | null
   dateProvisoire?: string | null
   prixParJour: number | string
   statut: LocationStatut
@@ -20,7 +20,7 @@ export type LocationPayload = {
   clientId: number
   grueId: number
   dateSortie: string
-  dateFin: string
+  dateFin?: string | null
   dateProvisoire?: string | null
   prixParJour: number
   notes?: string | null

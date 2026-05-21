@@ -36,6 +36,7 @@ export function LocationDetailPage() {
     onSuccess: () => {
       toast.success('Location terminée')
       void queryClient.invalidateQueries({ queryKey: ['locations'] })
+      void queryClient.invalidateQueries({ queryKey: ['locations', locationId, 'facture'] })
       void queryClient.invalidateQueries({ queryKey: ['grues'] })
       void queryClient.invalidateQueries({ queryKey: ['dashboard'] })
       setConfirmTerminer(false)
@@ -71,9 +72,15 @@ export function LocationDetailPage() {
           <CardContent className="space-y-3 text-sm">
             <div className="flex justify-between"><span className="text-muted-foreground">Statut</span><StatusBadge statut={location.statut} /></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Sortie</span><span>{formatDate(location.dateSortie)}</span></div>
-            <div className="flex justify-between"><span className="text-muted-foreground">Fin</span><span>{formatDate(location.dateFin)}</span></div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Fin</span>
+              <span>{location.dateFin ? formatDate(location.dateFin) : '— (en cours)'}</span>
+            </div>
             {location.dateProvisoire && (
-              <div className="flex justify-between"><span className="text-muted-foreground">Provisoire</span><span>{formatDate(location.dateProvisoire)}</span></div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Provisoire</span>
+                <span>{formatDate(location.dateProvisoire)}</span>
+              </div>
             )}
             <div className="flex justify-between"><span className="text-muted-foreground">Prix/jour</span><span>{formatFcfa(numberValue(location.prixParJour))}</span></div>
             {location.notes && <div><p className="text-muted-foreground">Notes</p><p>{location.notes}</p></div>}
@@ -85,6 +92,13 @@ export function LocationDetailPage() {
           <CardContent className="space-y-3 text-sm">
             {facture ? (
               <>
+                {location.statut === 'EN_COURS' && (
+                  <p className="text-xs text-muted-foreground">
+                    {location.dateProvisoire
+                      ? 'Calcul basé sur la date provisoire.'
+                      : 'Calcul basé sur la date du jour (location en cours).'}
+                  </p>
+                )}
                 <div className="flex justify-between"><span className="text-muted-foreground">Jours facturés</span><span className="font-semibold">{facture.jours}</span></div>
                 <div className="flex justify-between"><span className="text-muted-foreground">Prix/jour</span><span>{formatFcfa(facture.prixParJour)}</span></div>
                 <div className="flex justify-between border-t pt-3 text-base">
@@ -103,7 +117,7 @@ export function LocationDetailPage() {
         open={confirmTerminer}
         onOpenChange={setConfirmTerminer}
         title="Terminer la location"
-        description="La grue redeviendra disponible. Cette action est définitive."
+        description="La grue redeviendra disponible. La date de fin sera fixée à aujourd'hui. Cette action est définitive."
         confirmLabel="Terminer"
         loading={terminerMutation.isPending}
         onConfirm={() => terminerMutation.mutate()}

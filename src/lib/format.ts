@@ -31,6 +31,20 @@ export function toApiDateFromInput(dateStr: string): string {
   return `${dateStr} 00:00:00`
 }
 
+export function formatLocationPeriod(location: {
+  dateSortie: string
+  dateFin?: string | null
+  dateProvisoire?: string | null
+}): string {
+  if (location.dateFin) {
+    return `${formatDate(location.dateSortie)} → ${formatDate(location.dateFin)}`
+  }
+  if (location.dateProvisoire) {
+    return `${formatDate(location.dateSortie)} → prov. ${formatDate(location.dateProvisoire)}`
+  }
+  return `${formatDate(location.dateSortie)} → en cours`
+}
+
 export function numberValue(value: number | string | null | undefined): number {
   if (value == null) return 0
   return typeof value === 'string' ? Number(value) : value

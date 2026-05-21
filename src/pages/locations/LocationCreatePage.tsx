@@ -27,7 +27,6 @@ export function LocationCreatePage() {
   const [clientId, setClientId] = useState('')
   const [grueId, setGrueId] = useState('')
   const [dateSortie, setDateSortie] = useState('')
-  const [dateFin, setDateFin] = useState('')
   const [dateProvisoire, setDateProvisoire] = useState('')
   const [prixParJour, setPrixParJour] = useState('')
   const [notes, setNotes] = useState('')
@@ -57,7 +56,6 @@ export function LocationCreatePage() {
       clientId: Number(clientId),
       grueId: Number(grueId),
       dateSortie: toApiDateFromInput(dateSortie),
-      dateFin: toApiDateFromInput(dateFin),
       dateProvisoire: dateProvisoire ? toApiDateFromInput(dateProvisoire) : null,
       prixParJour: Number(prixParJour),
       notes: notes || null,
@@ -98,14 +96,20 @@ export function LocationCreatePage() {
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2"><Label>Date sortie *</Label><Input type="date" value={dateSortie} onChange={(e) => setDateSortie(e.target.value)} required /></div>
-              <div className="space-y-2"><Label>Date fin *</Label><Input type="date" value={dateFin} onChange={(e) => setDateFin(e.target.value)} required /></div>
-              <div className="space-y-2"><Label>Date provisoire</Label><Input type="date" value={dateProvisoire} onChange={(e) => setDateProvisoire(e.target.value)} /></div>
-              <div className="space-y-2"><Label>Prix par jour (FCFA) *</Label><Input type="number" min={1} value={prixParJour} onChange={(e) => setPrixParJour(e.target.value)} required /></div>
+              <div className="space-y-2">
+                <Label>Date provisoire</Label>
+                <Input type="date" value={dateProvisoire} onChange={(e) => setDateProvisoire(e.target.value)} />
+                <p className="text-xs text-muted-foreground">Estimation pour la facture tant que la location est en cours.</p>
+              </div>
+              <div className="space-y-2 sm:col-span-2"><Label>Prix par jour (FCFA) *</Label><Input type="number" min={1} value={prixParJour} onChange={(e) => setPrixParJour(e.target.value)} required /></div>
             </div>
             <div className="space-y-2"><Label>Notes</Label><Textarea value={notes} onChange={(e) => setNotes(e.target.value)} /></div>
+            <p className="text-xs text-muted-foreground">
+              La date de fin sera renseignée automatiquement à la clôture (Terminer).
+            </p>
           </CardContent>
           <CardFooter>
-            <Button type="submit" disabled={!clientId || !grueId || !dateSortie || !dateFin || !prixParJour || mutation.isPending}>
+            <Button type="submit" disabled={!clientId || !grueId || !dateSortie || !prixParJour || mutation.isPending}>
               {mutation.isPending ? 'Création…' : 'Créer la location'}
             </Button>
           </CardFooter>

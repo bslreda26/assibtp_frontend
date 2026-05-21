@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { formatDate, formatFcfa, numberValue } from '@/lib/format'
+import { formatFcfa, formatLocationPeriod, numberValue } from '@/lib/format'
 import * as clientsService from '@/services/clients.service'
 
 export function ClientDetailPage() {
@@ -92,7 +92,7 @@ export function ClientDetailPage() {
                       </Link>
                     </TableCell>
                     <TableCell>
-                      {formatDate(loc.dateSortie)} → {formatDate(loc.dateFin)}
+                      {formatLocationPeriod(loc)}
                     </TableCell>
                     <TableCell>
                       <StatusBadge statut={loc.statut} />

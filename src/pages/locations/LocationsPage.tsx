@@ -25,7 +25,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { useDebounce } from '@/hooks/useDebounce'
-import { formatDate, formatFcfa, numberValue } from '@/lib/format'
+import { formatFcfa, formatLocationPeriod, numberValue } from '@/lib/format'
 import * as locationsService from '@/services/locations.service'
 import type { LocationStatut } from '@/types/location'
 
@@ -114,7 +114,7 @@ export function LocationsPage() {
                       </Link>
                     </TableCell>
                     <TableCell>{loc.grue?.nom ?? `#${loc.grueId}`}</TableCell>
-                    <TableCell>{formatDate(loc.dateSortie)} → {formatDate(loc.dateFin)}</TableCell>
+                    <TableCell>{formatLocationPeriod(loc)}</TableCell>
                     <TableCell><StatusBadge statut={loc.statut} /></TableCell>
                     <TableCell>{formatFcfa(numberValue(loc.prixParJour))}</TableCell>
                   </TableRow>
