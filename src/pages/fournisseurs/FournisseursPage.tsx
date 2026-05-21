@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Building2, Plus } from 'lucide-react'
+import { Building2, Plus, Search } from 'lucide-react'
 import { toast } from 'sonner'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
@@ -26,6 +26,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { useDebounce } from '@/hooks/useDebounce'
 import { usePermissions } from '@/hooks/usePermissions'
 import { getApiErrorMessage } from '@/lib/api'
 import * as fournisseursService from '@/services/fournisseurs.service'
@@ -35,14 +36,21 @@ export function FournisseursPage() {
   const queryClient = useQueryClient()
   const { canManageFournisseurs } = usePermissions()
   const [page, setPage] = useState(1)
+  const [search, setSearch] = useState('')
+  const debouncedSearch = useDebounce(search)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editing, setEditing] = useState<Fournisseur | null>(null)
   const [deleteId, setDeleteId] = useState<number | null>(null)
   const [form, setForm] = useState<FournisseurPayload>({ nom: '', telephone: '', email: '', adresse: '', typeFourniture: '' })
 
   const { data, isLoading } = useQuery({
-    queryKey: ['fournisseurs', { page }],
-    queryFn: () => fournisseursService.listFournisseurs({ page, limit: 20 }),
+    queryKey: ['fournisseurs', { page, nom: debouncedSearch }],
+    queryFn: () =>
+      fournisseursService.listFournisseurs({
+        page,
+        limit: 20,
+        nom: debouncedSearch || undefined,
+      }),
   })
 
   const saveMutation = useMutation({
@@ -73,6 +81,19 @@ export function FournisseursPage() {
         description={canManageFournisseurs ? 'Gestion des fournisseurs externes.' : 'Consultation des fournisseurs (lecture seule).'}
         action={canManageFournisseurs ? <Button onClick={() => { setEditing(null); setForm({ nom: '', telephone: '', email: '', adresse: '', typeFourniture: '' }); setDialogOpen(true) }}><Plus className="size-4" />Nouveau</Button> : undefined}
       />
+
+      <div className="relative max-w-sm">
+        <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          className="pl-9"
+          placeholder="Rechercher par nom…"
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value)
+            setPage(1)
+          }}
+        />
+      </div>
 
       {isLoading ? <TableSkeleton cols={4} /> : !data?.data.length ? (
         <EmptyState icon={Building2} title="Aucun fournisseur" />

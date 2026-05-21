@@ -1,17 +1,14 @@
 import { api } from '@/lib/api'
-import { unwrapPaginated, type LucidPaginator } from '@/lib/paginate'
+import { listBody, postList } from '@/lib/paginate'
 import type { ApiSuccess, Paginated } from '@/types/api'
 import type { Fournisseur, FournisseurPayload } from '@/types/fournisseur'
 
 export async function listFournisseurs(params: {
   page?: number
   limit?: number
-  search?: string
+  nom?: string
 }): Promise<Paginated<Fournisseur>> {
-  const { data } = await api.get<ApiSuccess<LucidPaginator<Fournisseur>>>('/fournisseurs', {
-    params,
-  })
-  return unwrapPaginated(data.data)
+  return postList<Fournisseur>('/fournisseurs', listBody(params))
 }
 
 export async function getFournisseur(id: number): Promise<Fournisseur> {
@@ -20,7 +17,7 @@ export async function getFournisseur(id: number): Promise<Fournisseur> {
 }
 
 export async function createFournisseur(payload: FournisseurPayload): Promise<Fournisseur> {
-  const { data } = await api.post<ApiSuccess<Fournisseur>>('/fournisseurs', payload)
+  const { data } = await api.post<ApiSuccess<Fournisseur>>('/fournisseurs/create', payload)
   return data.data
 }
 

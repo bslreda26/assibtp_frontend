@@ -1,5 +1,5 @@
 import { api } from '@/lib/api'
-import { unwrapPaginated, type LucidPaginator } from '@/lib/paginate'
+import { listBody, postList } from '@/lib/paginate'
 import type { ApiSuccess, Paginated } from '@/types/api'
 import type {
   EntretienLocal,
@@ -10,13 +10,11 @@ import type {
 export async function listEntretienLocal(params: {
   page?: number
   limit?: number
+  grueId?: number
+  grueNom?: string
   statut?: EntretienStatut
 }): Promise<Paginated<EntretienLocal>> {
-  const { data } = await api.get<ApiSuccess<LucidPaginator<EntretienLocal>>>(
-    '/entretien-local',
-    { params }
-  )
-  return unwrapPaginated(data.data)
+  return postList<EntretienLocal>('/entretien-local', listBody(params))
 }
 
 export async function getEntretienLocal(id: number): Promise<EntretienLocal> {
@@ -27,7 +25,7 @@ export async function getEntretienLocal(id: number): Promise<EntretienLocal> {
 export async function createEntretienLocal(
   payload: EntretienLocalPayload
 ): Promise<EntretienLocal> {
-  const { data } = await api.post<ApiSuccess<EntretienLocal>>('/entretien-local', payload)
+  const { data } = await api.post<ApiSuccess<EntretienLocal>>('/entretien-local/create', payload)
   return data.data
 }
 

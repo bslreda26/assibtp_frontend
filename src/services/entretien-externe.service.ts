@@ -1,5 +1,5 @@
 import { api } from '@/lib/api'
-import { unwrapPaginated, type LucidPaginator } from '@/lib/paginate'
+import { listBody, postList } from '@/lib/paginate'
 import type { ApiSuccess, Paginated } from '@/types/api'
 import type {
   EntretienExterne,
@@ -10,13 +10,11 @@ import type {
 export async function listEntretienExterne(params: {
   page?: number
   limit?: number
+  grueId?: number
+  grueNom?: string
   statut?: EntretienStatut
 }): Promise<Paginated<EntretienExterne>> {
-  const { data } = await api.get<ApiSuccess<LucidPaginator<EntretienExterne>>>(
-    '/entretien-externe',
-    { params }
-  )
-  return unwrapPaginated(data.data)
+  return postList<EntretienExterne>('/entretien-externe', listBody(params))
 }
 
 export async function getEntretienExterne(id: number): Promise<EntretienExterne> {
@@ -27,7 +25,10 @@ export async function getEntretienExterne(id: number): Promise<EntretienExterne>
 export async function createEntretienExterne(
   payload: EntretienExternePayload
 ): Promise<EntretienExterne> {
-  const { data } = await api.post<ApiSuccess<EntretienExterne>>('/entretien-externe', payload)
+  const { data } = await api.post<ApiSuccess<EntretienExterne>>(
+    '/entretien-externe/create',
+    payload
+  )
   return data.data
 }
 

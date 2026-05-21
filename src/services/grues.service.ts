@@ -1,15 +1,15 @@
 import { api } from '@/lib/api'
-import { unwrapPaginated, type LucidPaginator } from '@/lib/paginate'
+import { listBody, postList } from '@/lib/paginate'
 import type { ApiSuccess, Paginated } from '@/types/api'
 import type { Grue, GruePayload, GrueStatut } from '@/types/grue'
 
 export async function listGrues(params: {
   page?: number
   limit?: number
+  nom?: string
   statut?: GrueStatut
 }): Promise<Paginated<Grue>> {
-  const { data } = await api.get<ApiSuccess<LucidPaginator<Grue>>>('/grues', { params })
-  return unwrapPaginated(data.data)
+  return postList<Grue>('/grues', listBody(params))
 }
 
 export async function getGruesDisponibles(): Promise<Grue[]> {
@@ -23,7 +23,7 @@ export async function getGrue(id: number): Promise<Grue> {
 }
 
 export async function createGrue(payload: GruePayload): Promise<Grue> {
-  const { data } = await api.post<ApiSuccess<Grue>>('/grues', payload)
+  const { data } = await api.post<ApiSuccess<Grue>>('/grues/create', payload)
   return data.data
 }
 

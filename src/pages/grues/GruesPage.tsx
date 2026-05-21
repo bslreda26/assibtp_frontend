@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Plus, Truck } from 'lucide-react'
+import { Plus, Search, Truck } from 'lucide-react'
 import { toast } from 'sonner'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
@@ -34,6 +34,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { useDebounce } from '@/hooks/useDebounce'
 import { usePermissions } from '@/hooks/usePermissions'
 import { getApiErrorMessage } from '@/lib/api'
 import * as gruesService from '@/services/grues.service'
@@ -47,6 +48,8 @@ export function GruesPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const disponiblesOnly = searchParams.get('disponibles') === 'true'
   const [page, setPage] = useState(1)
+  const [search, setSearch] = useState('')
+  const debouncedSearch = useDebounce(search)
   const [statutFilter, setStatutFilter] = useState<GrueStatut | ''>(
     disponiblesOnly ? 'DISPONIBLE' : ''
   )
@@ -64,11 +67,12 @@ export function GruesPage() {
   })
 
   const { data, isLoading } = useQuery({
-    queryKey: ['grues', { page, statut: statutFilter }],
+    queryKey: ['grues', { page, statut: statutFilter, nom: debouncedSearch }],
     queryFn: () =>
       gruesService.listGrues({
         page,
         limit: 20,
+        nom: debouncedSearch || undefined,
         statut: statutFilter || undefined,
       }),
   })
@@ -115,6 +119,19 @@ export function GruesPage() {
           ) : undefined
         }
       />
+
+      <div className="relative max-w-sm">
+        <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          className="pl-9"
+          placeholder="Rechercher par nom…"
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value)
+            setPage(1)
+          }}
+        />
+      </div>
 
       <div className="flex flex-wrap gap-2">
         <Button

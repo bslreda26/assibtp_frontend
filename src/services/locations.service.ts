@@ -1,15 +1,16 @@
 import { api } from '@/lib/api'
-import { unwrapPaginated, type LucidPaginator } from '@/lib/paginate'
+import { listBody, postList } from '@/lib/paginate'
 import type { ApiSuccess, Paginated } from '@/types/api'
 import type { FactureData, Location, LocationPayload, LocationStatut } from '@/types/location'
 
 export async function listLocations(params: {
   page?: number
   limit?: number
+  clientId?: number
+  clientNom?: string
   statut?: LocationStatut
 }): Promise<Paginated<Location>> {
-  const { data } = await api.get<ApiSuccess<LucidPaginator<Location>>>('/locations', { params })
-  return unwrapPaginated(data.data)
+  return postList<Location>('/locations', listBody(params))
 }
 
 export async function getLocation(id: number): Promise<Location> {
@@ -18,7 +19,7 @@ export async function getLocation(id: number): Promise<Location> {
 }
 
 export async function createLocation(payload: LocationPayload): Promise<Location> {
-  const { data } = await api.post<ApiSuccess<Location>>('/locations', payload)
+  const { data } = await api.post<ApiSuccess<Location>>('/locations/create', payload)
   return data.data
 }
 

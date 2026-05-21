@@ -44,8 +44,8 @@ export function ClientsPage() {
   const [form, setForm] = useState<ClientPayload>({ nom: '', telephone: '', email: '', adresse: '' })
 
   const { data, isLoading } = useQuery({
-    queryKey: ['clients', { page, search: debouncedSearch }],
-    queryFn: () => clientsService.listClients({ page, limit: 20, search: debouncedSearch || undefined }),
+    queryKey: ['clients', { page, nom: debouncedSearch }],
+    queryFn: () => clientsService.listClients({ page, limit: 20, nom: debouncedSearch || undefined }),
   })
 
   const saveMutation = useMutation({

@@ -1,20 +1,21 @@
 import { api } from '@/lib/api'
-import { unwrapPaginated, type LucidPaginator } from '@/lib/paginate'
+import { listBody, postList } from '@/lib/paginate'
 import type { ApiSuccess, Paginated } from '@/types/api'
 import type { StockPayload, StockPiece } from '@/types/stock'
 
 export async function listStock(params: {
   page?: number
   limit?: number
+  nom?: string
   alerte?: boolean
 }): Promise<Paginated<StockPiece>> {
-  const { data } = await api.get<ApiSuccess<LucidPaginator<StockPiece>>>('/stock', {
-    params: {
-      ...params,
-      alerte: params.alerte ? 'true' : undefined,
-    },
+  const body = listBody({
+    page: params.page,
+    limit: params.limit,
+    nom: params.nom,
+    ...(params.alerte ? { alerte: true } : {}),
   })
-  return unwrapPaginated(data.data)
+  return postList<StockPiece>('/stock', body)
 }
 
 export async function getStockPiece(id: number): Promise<StockPiece> {
@@ -23,7 +24,7 @@ export async function getStockPiece(id: number): Promise<StockPiece> {
 }
 
 export async function createStockPiece(payload: StockPayload): Promise<StockPiece> {
-  const { data } = await api.post<ApiSuccess<StockPiece>>('/stock', payload)
+  const { data } = await api.post<ApiSuccess<StockPiece>>('/stock/create', payload)
   return data.data
 }
 

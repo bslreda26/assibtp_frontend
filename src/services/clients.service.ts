@@ -1,15 +1,14 @@
 import { api } from '@/lib/api'
-import { unwrapPaginated, type LucidPaginator } from '@/lib/paginate'
+import { listBody, postList } from '@/lib/paginate'
 import type { ApiSuccess, Paginated } from '@/types/api'
 import type { Client, ClientPayload } from '@/types/client'
 
 export async function listClients(params: {
   page?: number
   limit?: number
-  search?: string
+  nom?: string
 }): Promise<Paginated<Client>> {
-  const { data } = await api.get<ApiSuccess<LucidPaginator<Client>>>('/clients', { params })
-  return unwrapPaginated(data.data)
+  return postList<Client>('/clients', listBody(params))
 }
 
 export async function getClient(id: number): Promise<Client> {
@@ -18,7 +17,7 @@ export async function getClient(id: number): Promise<Client> {
 }
 
 export async function createClient(payload: ClientPayload): Promise<Client> {
-  const { data } = await api.post<ApiSuccess<Client>>('/clients', payload)
+  const { data } = await api.post<ApiSuccess<Client>>('/clients/create', payload)
   return data.data
 }
 

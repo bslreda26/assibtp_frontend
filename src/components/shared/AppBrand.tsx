@@ -1,4 +1,4 @@
-import { Truck } from 'lucide-react'
+import { GrueIcon } from '@/components/shared/GrueIcon'
 import { cn } from '@/lib/utils'
 import { APP_NAME, APP_TAGLINE } from '@/lib/brand'
 
@@ -20,7 +20,7 @@ export function AppBrand({ variant = 'default', className }: AppBrandProps) {
           isCompact && 'size-9'
         )}
       >
-        <Truck className={cn(isCompact ? 'size-5' : 'size-6')} />
+        <GrueIcon className={cn(isCompact ? 'size-5' : 'size-6')} />
       </div>
       <div className="min-w-0">
         {isSidebar ? (

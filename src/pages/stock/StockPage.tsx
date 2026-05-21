@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useSearchParams } from 'react-router-dom'
-import { AlertTriangle, Package, Plus } from 'lucide-react'
+import { AlertTriangle, Package, Plus, Search } from 'lucide-react'
 import { toast } from 'sonner'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { EmptyState } from '@/components/shared/EmptyState'
@@ -25,6 +25,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { useDebounce } from '@/hooks/useDebounce'
 import { usePermissions } from '@/hooks/usePermissions'
 import { getApiErrorMessage } from '@/lib/api'
 import { formatFcfa, numberValue } from '@/lib/format'
@@ -38,6 +39,8 @@ export function StockPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const alerteOnly = searchParams.get('alerte') === 'true'
   const [page, setPage] = useState(1)
+  const [search, setSearch] = useState('')
+  const debouncedSearch = useDebounce(search)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [ajusterPiece, setAjusterPiece] = useState<StockPiece | null>(null)
   const [delta, setDelta] = useState('')
@@ -52,8 +55,14 @@ export function StockPage() {
   })
 
   const { data, isLoading } = useQuery({
-    queryKey: ['stock', { page, alerte: alerteOnly }],
-    queryFn: () => stockService.listStock({ page, limit: 20, alerte: alerteOnly }),
+    queryKey: ['stock', { page, alerte: alerteOnly, nom: debouncedSearch }],
+    queryFn: () =>
+      stockService.listStock({
+        page,
+        limit: 20,
+        nom: debouncedSearch || undefined,
+        alerte: alerteOnly,
+      }),
   })
 
   const saveMutation = useMutation({
@@ -96,11 +105,42 @@ export function StockPage() {
         }
       />
 
-      <div className="flex gap-2">
-        <Button variant={alerteOnly ? 'default' : 'outline'} size="sm" onClick={() => { setSearchParams({ alerte: 'true' }); setPage(1) }}>
-          <AlertTriangle className="size-4" />Alertes uniquement
-        </Button>
-        <Button variant={!alerteOnly ? 'default' : 'outline'} size="sm" onClick={() => { setSearchParams({}); setPage(1) }}>Tout le stock</Button>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="relative max-w-sm flex-1">
+          <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            className="pl-9"
+            placeholder="Rechercher par nom…"
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value)
+              setPage(1)
+            }}
+          />
+        </div>
+        <div className="flex gap-2">
+          <Button
+            variant={alerteOnly ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => {
+              setSearchParams({ alerte: 'true' })
+              setPage(1)
+            }}
+          >
+            <AlertTriangle className="size-4" />
+            Alertes uniquement
+          </Button>
+          <Button
+            variant={!alerteOnly ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => {
+              setSearchParams({})
+              setPage(1)
+            }}
+          >
+            Tout le stock
+          </Button>
+        </div>
       </div>
 
       {isLoading ? (

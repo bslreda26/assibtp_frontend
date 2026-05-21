@@ -1,4 +1,5 @@
 import axios from 'axios'
+import type { ApiError } from '@/types/api'
 
 export const TOKEN_KEY = 'gruebtp_token'
 export const USER_KEY = 'gruebtp_user'
@@ -32,7 +33,7 @@ api.interceptors.response.use(
 
 export function getApiErrorMessage(error: unknown): string {
   if (axios.isAxiosError(error) && error.response?.data) {
-    const d = error.response.data as { error?: string; details?: unknown }
+    const d = error.response.data as ApiError
     if (d.details && Array.isArray(d.details)) {
       const msgs = d.details
         .map((item) => {
